@@ -1,0 +1,19 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">本机演示 · 资料未同步给家人</view>
+  <view wx:if="{{loading}}" class="empty">正在读取记录…</view>
+  <view wx:elif="{{error}}" class="empty"><view>{{error}}</view><button class="secondary" bindtap="retry">重试</button><button class="secondary" bindtap="goArchive">返回档案</button></view>
+  <block wx:elif="{{visit}}">
+    <view class="subtitle">{{person.name}} · {{visit.date || '日期待确认'}}</view><view class="title">{{visit.diagnosis || '就诊记录'}}</view><view class="muted">{{visit.hospital || '医院待补充'}}</view>
+    <view class="card"><view class="section-title">就诊经过</view>
+      <view class="detail-row"><text class="muted">接诊医生</text><text>{{visit.doctor || '未记录'}}</text></view>
+      <view class="detail-block"><view class="muted">主诉</view><text selectable>{{visit.chiefComplaint || '未记录'}}</text></view>
+      <view class="detail-block"><view class="muted">查体结果</view><text selectable>{{visit.examination || '未记录'}}</text></view>
+      <view class="detail-block"><view class="muted">诊断原文</view><text selectable>{{visit.diagnosis || '未记录'}}</text></view>
+      <view class="tags"><text wx:for="{{visit.symptoms}}" wx:key="*this" class="badge">{{item}}</text></view>
+    </view>
+    <view wx:if="{{labs.length}}" class="card"><view class="section-title">相关检查</view><button wx:for="{{labs}}" wx:key="id" class="record-link" data-id="{{item.id}}" bindtap="openDocument"><view>{{item.extracted.conclusion || item.extracted.findings || '查看检查结果'}}</view><view class="muted">{{item.dateLabel}} · {{item.isReference ? '多次就诊引用同一原件' : '已关联本次就诊'}}</view><view class="muted">查看项目与原件 ›</view></button></view>
+    <view wx:if="{{medications.length}}" class="card"><view class="section-title">处方与实际用药</view><view wx:for="{{medications}}" wx:key="id" class="medication-row"><view class="medication-name">{{item.name}}</view><view class="muted">处方：{{item.specification || '规格未记录'}} · {{item.dose || '剂量未记录'}} · {{item.frequency || '频次未记录'}}</view><view class="usage">{{item.usageLabel}}</view><view wx:if="{{item.note}}">备注：{{item.note}}</view><button class="secondary" data-id="{{item.id}}" bindtap="openMedication">记录／修改实际用药</button></view><view class="muted">处方记录不代表已经实际服药。</view></view>
+    <view class="card"><view class="section-title">关联资料与原件</view><view wx:if="{{!documents.length}}" class="muted">还没有关联资料</view><button wx:for="{{documents}}" wx:key="id" class="record-link" data-id="{{item.id}}" bindtap="openDocument"><view>{{item.kindLabel}} <text class="badge">{{item.fileCount}} 页</text></view><view class="muted">{{item.dateLabel}} · {{item.status === 'confirmed' ? '已核对' : '待核对'}}</view></button></view>
+    <button class="primary" bindtap="addDocuments">为本次就诊补充资料</button>
+  </block>
+</view>

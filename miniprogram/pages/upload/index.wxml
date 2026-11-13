@@ -1,0 +1,64 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">本机演示 · 不进行真实 AI 识别或家庭同步</view>
+  <view wx:if="{{!person}}" class="empty"><text>先为孩子建立一个健康档案</text><button class="primary" bindtap="addPerson">添加档案</button></view>
+  <block wx:else>
+    <view class="subtitle">{{person.name}}的资料</view><view class="title">{{stage === 'select' ? '把纸上的记录，收好' : '看一眼，再存入档案'}}</view>
+    <view class="muted">{{stage === 'select' ? '同一份单据的多页照片可以一起选择。' : '识别文字可以修改，原件始终保留。'}}</view>
+    <view wx:if="{{error}}" class="notice error" role="alert">{{error}}<button wx:if="{{document}}" class="secondary" bindtap="reloadDocument">重新读取已保存资料</button></view>
+    <view class="card">
+      <view class="section-title">资料类型</view>
+      <view class="kind-row"><button wx:for="{{kinds}}" wx:key="value" class="kind {{kind === item.value ? 'selected' : ''}}" data-kind="{{item.value}}" disabled="{{busy || document}}" bindtap="selectKind">{{item.label}}</button></view>
+      <view wx:for="{{files}}" wx:key="path" class="file-row"><button class="file-name" data-index="{{index}}" bindtap="previewFile">{{item.type === 'pdf' ? 'PDF' : '照片'}} · {{item.name}}</button><button wx:if="{{!document}}" class="remove" data-index="{{index}}" bindtap="removeFile" disabled="{{busy}}">移除</button></view>
+      <view wx:if="{{!document}}" class="row file-actions"><button class="secondary" bindtap="chooseImages" disabled="{{busy || files.length >= 9}}">拍照／相册</button><button class="secondary" bindtap="choosePdf" disabled="{{busy || files.length >= 9}}">微信中的 PDF</button></view>
+      <view wx:if="{{!files.length}}" class="muted">最多选择 9 页；不同类型的单据请分别整理。</view>
+    </view>
+    <block wx:if="{{stage === 'select'}}">
+      <view class="notice">{{mode === 'demo' ? '本机模式会保存你选择的文件，但识别结果是示例内容，请勿当作真实识别结果。' : '资料将发送到云端识别服务，核对后再归档。'}}</view>
+      <button class="primary" loading="{{busy}}" disabled="{{busy}}" bindtap="recognize">{{mode === 'demo' ? '保存并体验模拟识别' : '保存并识别'}}</button>
+      <button class="secondary" disabled="{{busy}}" bindtap="manual">保存原件并手动整理</button>
+    </block>
+    <block wx:else>
+      <view class="notice" wx:if="{{draft.needsReview.length}}"><view>请重点核对</view><view wx:for="{{draft.needsReview}}" wx:key="*this">· {{item}}</view></view>
+      <view class="card">
+        <label class="field">单据上的就诊人<input class="input" value="{{draft.patientName}}" data-field="patientName" bindinput="updateField" /></label>
+        <label class="field">单据年龄（就诊时）<input class="input" value="{{draft.age}}" data-field="age" bindinput="updateField" placeholder="如：3岁6个月；未记录可留空" /></label>
+        <label class="field">医院<input class="input" value="{{draft.hospital}}" data-field="hospital" bindinput="updateField" placeholder="未识别时可留空" /></label>
+        <label class="field">科室<input class="input" value="{{draft.department}}" data-field="department" bindinput="updateField" placeholder="未识别时可留空" /></label>
+        <view class="field">{{kind === 'lab' ? '检查日期' : kind === 'prescription' ? '开方日期' : '就诊日期'}}<view class="date-row"><picker mode="date" value="{{draft.date}}" data-field="date" bindchange="updateField"><view class="input">{{draft.date || '日期待确认'}}</view></picker><button class="remove" bindtap="clearDate">留空</button></view></view>
+        <label class="field">医生<input class="input" value="{{draft.doctor}}" data-field="doctor" bindinput="updateField" placeholder="未识别时可留空" /></label>
+        <block wx:if="{{kind === 'medical'}}">
+          <label class="field">主诉与症状<textarea class="input textarea" value="{{draft.chiefComplaint}}" data-field="chiefComplaint" bindinput="updateField" auto-height /></label>
+          <label class="field">查体结果<textarea class="input textarea" value="{{draft.examination}}" data-field="examination" bindinput="updateField" auto-height /></label>
+          <label class="field">诊断原文<textarea class="input textarea" value="{{draft.diagnosis}}" data-field="diagnosis" bindinput="updateField" auto-height /></label>
+          <label class="field">明确存在的症状标签<input class="input" value="{{symptomsText}}" bindinput="updateSymptoms" placeholder="用顿号分隔，如：咳嗽、打喷嚏" /></label>
+          <view class="muted">“无咳嗽”“疑似”等原文保留，勿填写为确定存在的症状。</view>
+        </block>
+        <block wx:if="{{kind === 'lab'}}">
+          <view class="field">采样日期<view class="date-row"><picker mode="date" value="{{draft.collectionDate}}" data-field="collectionDate" bindchange="updateField"><view class="input">{{draft.collectionDate || '未记录'}}</view></picker><button class="remove" data-field="collectionDate" bindtap="clearDate">留空</button></view></view>
+          <view class="field">报告日期<view class="date-row"><picker mode="date" value="{{draft.reportDate}}" data-field="reportDate" bindchange="updateField"><view class="input">{{draft.reportDate || '未记录'}}</view></picker><button class="remove" data-field="reportDate" bindtap="clearDate">留空</button></view></view>
+          <label class="field">检查所见<textarea class="input textarea" value="{{draft.findings}}" data-field="findings" bindinput="updateField" auto-height /></label>
+          <label class="field">检查结论<textarea class="input textarea" value="{{draft.conclusion}}" data-field="conclusion" bindinput="updateField" auto-height /></label>
+          <view wx:for="{{draft.items}}" wx:key="index" class="item-editor">
+            <view class="row"><view class="section-title">项目 {{index + 1}}</view><button class="remove" data-group="items" data-index="{{index}}" bindtap="removeRow">移除</button></view>
+            <label class="field">项目名称<input class="input" value="{{item.name}}" data-group="items" data-index="{{index}}" data-field="name" bindinput="updateItem" /></label>
+            <view class="pair"><label class="field">结果<input class="input" value="{{item.value}}" data-group="items" data-index="{{index}}" data-field="value" bindinput="updateItem" /></label><label class="field">单位<input class="input" value="{{item.unit}}" data-group="items" data-index="{{index}}" data-field="unit" bindinput="updateItem" /></label></view>
+            <label class="field">参考范围<input class="input" value="{{item.referenceRange}}" data-group="items" data-index="{{index}}" data-field="referenceRange" bindinput="updateItem" /></label>
+            <label class="field">原报告异常标记<input class="input" value="{{item.flag}}" data-group="items" data-index="{{index}}" data-field="flag" bindinput="updateItem" placeholder="仅录入原单内容" /></label>
+          </view><button class="secondary" bindtap="addItem">添加检查项目</button>
+        </block>
+        <block wx:if="{{kind === 'prescription'}}">
+          <view wx:for="{{draft.medications}}" wx:key="index" class="item-editor">
+            <view class="row"><view class="section-title">药品 {{index + 1}}</view><button class="remove" data-group="medications" data-index="{{index}}" bindtap="removeRow">移除</button></view>
+            <label class="field">药品名称<input class="input" value="{{item.name}}" data-group="medications" data-index="{{index}}" data-field="name" bindinput="updateItem" /></label>
+            <label class="field">规格<input class="input" value="{{item.specification}}" data-group="medications" data-index="{{index}}" data-field="specification" bindinput="updateItem" /></label>
+            <label class="field">单次剂量<input class="input" value="{{item.dose}}" data-group="medications" data-index="{{index}}" data-field="dose" bindinput="updateItem" placeholder="不明确时留空，不推算" /></label>
+            <view class="pair"><label class="field">频次<input class="input" value="{{item.frequency}}" data-group="medications" data-index="{{index}}" data-field="frequency" bindinput="updateItem" /></label><label class="field">疗程<input class="input" value="{{item.duration}}" data-group="medications" data-index="{{index}}" data-field="duration" bindinput="updateItem" /></label></view>
+          </view><button class="secondary" bindtap="addMedication">添加药品</button>
+          <view class="muted">处方内容与实际服药分别记录；归档后可补充实际开始、停止日期。</view>
+        </block>
+      </view>
+      <view class="card"><view class="field">归档位置</view><picker range="{{destinations}}" value="{{destinationIndex}}" bindchange="selectDestination"><view class="input">{{destinations[destinationIndex]}}</view></picker><view class="muted">检查单可先独立保存，再关联同一人的就诊。</view></view>
+      <button class="primary" loading="{{busy}}" disabled="{{busy}}" bindtap="save">确认保存</button><button class="secondary" disabled="{{busy}}" bindtap="startAnother">重新选择资料</button>
+    </block>
+  </block>
+</view>

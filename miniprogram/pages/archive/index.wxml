@@ -1,0 +1,28 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">演示模式 · 仅本机数据</view>
+  <view class="people-row"><button wx:for="{{persons}}" wx:key="id" class="{{item.chipClass}}" data-id="{{item.id}}" bindtap="changePerson"><text class="initial">{{item.initial}}</text>{{item.name}}</button></view>
+  <view class="title">档案时间线</view>
+  <view class="subtitle">{{person.name || '尚未选择档案'}} · 找到每条记录的出处</view>
+  <block wx:if="{{person}}">
+    <input class="input search" type="text" value="{{query}}" placeholder="搜索症状、诊断、检查或药品" confirm-type="search" bindinput="onQueryInput" bindconfirm="querySubmit" />
+    <view class="filters">
+      <view class="filter"><view class="field">搜索范围</view><picker range="{{categories}}" range-key="label" value="{{categoryIndex}}" data-key="categoryIndex" bindchange="onPicker"><view class="input picker">{{categories[categoryIndex].label}}<text>⌄</text></view></picker></view>
+      <view class="filter"><view class="field">时间范围</view><picker range="{{types}}" range-key="label" value="{{typeIndex}}" data-key="typeIndex" bindchange="onPicker"><view class="input picker">{{types[typeIndex].label}}<text>⌄</text></view></picker></view>
+      <view wx:if="{{showYear}}" class="filter"><view class="field">年份</view><picker range="{{years}}" value="{{yearIndex}}" data-key="yearIndex" bindchange="onPicker"><view class="input picker">{{years[yearIndex]}}年<text>⌄</text></view></picker></view>
+      <view wx:if="{{showMonth}}" class="filter"><view class="field">月份</view><picker range="{{months}}" value="{{monthIndex}}" data-key="monthIndex" bindchange="onPicker"><view class="input picker">{{months[monthIndex]}}<text>⌄</text></view></picker></view>
+      <view wx:if="{{showQuarter}}" class="filter"><view class="field">季度</view><picker range="{{quarters}}" value="{{quarterIndex}}" data-key="quarterIndex" bindchange="onPicker"><view class="input picker">{{quarters[quarterIndex]}}<text>⌄</text></view></picker></view>
+      <view wx:if="{{showSeason}}" class="filter"><view class="field">季节</view><picker range="{{seasons}}" value="{{seasonIndex}}" data-key="seasonIndex" bindchange="onPicker"><view class="input picker">{{seasons[seasonIndex]}}<text>⌄</text></view></picker></view>
+    </view>
+    <view class="shortcuts"><button wx:for="{{shortcuts}}" wx:key="*this" class="quick" data-query="{{item}}" bindtap="shortcut">{{item}}</button><button class="quick" bindtap="clear">清除筛选</button></view>
+    <view class="range muted">{{rangeLabel}}</view>
+    <view wx:if="{{categoryIndex === 1}}" class="search-note muted">症状标签只包含已确认存在的症状；否定和疑似描述保留在原文中。</view>
+    <view wx:if="{{error}}" class="notice"><view>{{error}}</view><button class="secondary" bindtap="search">重新检索</button></view>
+    <view wx:elif="{{loading}}" class="empty">正在检索…</view>
+    <block wx:else>
+      <view class="result-count muted">{{visits.length}} 次相关就诊 · 按就诊日期排列</view>
+      <view wx:if="{{!visits.length}}" class="card empty">暂无匹配记录，试试其他关键词或时间范围。</view>
+      <button wx:for="{{visits}}" wx:key="id" class="card visit-card" data-id="{{item.id}}" bindtap="openVisit"><view class="row muted"><text>{{item.dateText}}</text><text>{{item.hospital || '医院待补充'}}</text></view><view class="visit-title">{{item.title}}</view><view class="muted">{{item.matchText || item.chiefComplaint}}</view><view class="tags"><text wx:for="{{item.symptoms}}" wx:for-item="symptom" wx:key="*this" class="badge">{{symptom}}</text><text class="badge">{{item.documentCount}} 份资料</text></view></button>
+    </block>
+  </block>
+  <view wx:else class="empty"><view>先为一位家人创建档案</view><button class="primary" bindtap="addPerson">添加档案</button></view>
+</view>

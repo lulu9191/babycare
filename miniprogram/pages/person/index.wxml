@@ -1,0 +1,18 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">演示模式 · 档案与头像仅保存在本机</view>
+  <view class="title page-title">{{isNew ? '添加健康档案' : '编辑健康档案'}}</view>
+  <view class="subtitle">每位家人的资料，分别保存</view>
+  <view wx:if="{{error}}" class="notice"><view>{{error}}</view><button class="secondary" bindtap="retry">重新加载</button></view>
+  <view wx:elif="{{loading}}" class="empty">正在读取…</view>
+  <block wx:else>
+    <button class="avatar-button" bindtap="chooseAvatar" disabled="{{saving}}"><image wx:if="{{avatarPath}}" class="avatar-large" src="{{avatarPath}}" mode="aspectFill" /><view wx:else class="avatar-large fallback">{{initial}}</view><text>选择头像</text></button>
+    <view class="card">
+      <view class="field">档案名称</view><input class="input" value="{{name}}" maxlength="40" placeholder="例如：小宝、大宝" bindinput="onName" disabled="{{saving}}" />
+      <view class="row birthday-label"><view class="field">出生日期（可选）</view><button wx:if="{{birthDate}}" class="text-button" bindtap="clearBirthDate" disabled="{{saving}}">清空</button></view>
+      <picker mode="date" value="{{birthDate}}" end="{{today}}" bindchange="onBirthDate" disabled="{{saving}}"><view class="input date-picker {{birthDate ? '' : 'muted'}}">{{birthDate || '选择出生日期'}}<text>⌄</text></view></picker>
+      <view class="muted help">历史病历上的年龄会单独保留，不随现在的年龄变化。</view>
+    </view>
+    <button class="primary save-button" bindtap="save" loading="{{saving}}" disabled="{{saving}}">{{saving ? '正在保存' : '保存档案'}}</button>
+    <view class="muted help">档案所属人与使用小程序的家庭成员账号分别管理。</view>
+  </block>
+</view>

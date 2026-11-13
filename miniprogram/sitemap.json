@@ -1,0 +1,4 @@
+{
+  "desc": "家庭档案不开放搜索索引",
+  "rules": [{ "action": "disallow", "page": "*" }]
+}

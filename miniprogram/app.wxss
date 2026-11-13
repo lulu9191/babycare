@@ -1,0 +1,25 @@
+page { background: #f7f8f4; color: #263c32; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; font-size: 28rpx; line-height: 1.6; }
+view, text, button, input, textarea, picker { box-sizing: border-box; }
+.page { padding: 28rpx 32rpx calc(40rpx + env(safe-area-inset-bottom)); }
+.card { background: #fff; border: 1rpx solid #e4e9e1; border-radius: 28rpx; padding: 28rpx; margin-bottom: 24rpx; }
+.title { font-size: 42rpx; font-weight: 600; line-height: 1.4; margin-bottom: 12rpx; }
+.subtitle, .muted { color: #607268; font-size: 24rpx; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; flex-wrap: wrap; }
+.section-title { font-size: 30rpx; font-weight: 600; margin: 28rpx 0 18rpx; }
+.badge { display: inline-block; color: #35664e; background: #e8f0e6; padding: 4rpx 12rpx; border-radius: 10rpx; font-size: 22rpx; margin: 8rpx 10rpx 0 0; }
+button { font-size: 28rpx; border-radius: 20rpx; min-height: 88rpx; line-height: 1.5; padding: 22rpx 26rpx; }
+button::after { border: none; }
+.primary { background: #35664e; color: #fff; margin-top: 20rpx; }
+.primary[disabled] { background: #c6d5c9; color: #607268; }
+.secondary { background: #fff; color: #35664e; border: 1rpx solid #dbe5da; margin-top: 16rpx; }
+.field { display: block; margin-bottom: 24rpx; color: #607268; font-size: 24rpx; }
+.input { background: #fff; color: #263c32; border: 1rpx solid #dfe6dc; padding: 20rpx; border-radius: 16rpx; min-height: 88rpx; font-size: 30rpx; margin-top: 10rpx; width: 100%; }
+input.input { height: 88rpx; }
+textarea.input { min-height: 160rpx; }
+.empty { text-align: center; color: #607268; padding: 60rpx 20rpx; }
+.notice { background: #e8f0e6; border-radius: 20rpx; padding: 22rpx; color: #35664e; margin-bottom: 24rpx; font-size: 24rpx; }
+.demo-banner { background: #fbf1df; color: #78582c; border-radius: 16rpx; padding: 16rpx 20rpx; margin-bottom: 24rpx; font-size: 23rpx; }
+.person-chip { display: inline-flex; align-items: center; gap: 12rpx; padding: 12rpx 24rpx; border: 1rpx solid #dce4da; border-radius: 50rpx; background: #fff; margin-right: 14rpx; min-height: 88rpx; }
+.person-chip.active { background: #e8f0e6; color: #35664e; border-color: #35664e; }
+.avatar { width: 64rpx; height: 64rpx; border-radius: 50%; background: #e8f0e6; }
+.error { color: #9c493d; padding: 18rpx 0; }

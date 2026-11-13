@@ -1,0 +1,35 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">演示模式 · 资料仅保存在本机，尚未同步给家人</view>
+  <view class="people-row">
+    <button wx:for="{{persons}}" wx:key="id" class="{{item.chipClass}}" data-id="{{item.id}}" bindtap="changePerson">
+      <image wx:if="{{item.avatarPath}}" class="avatar" src="{{item.avatarPath}}" mode="aspectFill" />
+      <text wx:else class="avatar fallback">{{item.initial}}</text><text>{{item.name}}</text>
+    </button>
+    <button class="add-person" bindtap="addPerson" aria-label="添加健康档案">＋</button>
+  </view>
+  <view wx:if="{{error}}" class="notice"><text>{{error}}</text><button class="secondary" bindtap="retry">重新加载</button></view>
+  <view wx:elif="{{loading}}" class="empty">正在整理档案…</view>
+  <view wx:elif="{{!person}}" class="empty"><view class="section-title">先添加一位家人的档案</view><view>为孩子上传头像、填写姓名，开始记录。</view><button class="primary" bindtap="addPerson">添加档案</button></view>
+  <block wx:else>
+    <view class="subtitle">{{person.name}}的健康记录</view>
+    <view class="title">每一次照护，都有迹可循</view>
+    <view class="periods"><button wx:for="{{periods}}" wx:key="value" class="period {{period === item.value ? 'selected' : ''}}" data-value="{{item.value}}" bindtap="changePeriod">{{item.label}}</button></view>
+    <view class="range muted">{{overview.rangeLabel}}</view>
+    <view class="card metrics">
+      <view class="metric"><text class="number">{{overview.visitCount}}</text><text class="muted">就诊记录</text></view>
+      <view class="metric"><text class="number">{{overview.documentCount}}</text><text class="muted">检查报告</text></view>
+      <view class="metric"><text class="number">{{overview.prescriptionCount}}</text><text class="muted">处方记录</text></view>
+    </view>
+    <view class="notice"><view>已归组 {{overview.episodeCount}} 个病程／体检事件</view><view class="muted">复诊可归入同一病程；仅汇总已录入资料。</view></view>
+    <button class="primary upload-button" bindtap="openUpload">拍照上传资料</button>
+    <view class="upload-caption muted">病历、检查单、处方，一起整理</view>
+    <view class="row section-heading"><view class="section-title">最近就诊</view><button class="text-button" bindtap="openArchive">查看全部 ›</button></view>
+    <view wx:if="{{!recentVisits.length}}" class="card empty">这个时间范围暂无就诊记录</view>
+    <button wx:for="{{recentVisits}}" wx:key="id" class="card visit-card" data-id="{{item.id}}" bindtap="openVisit">
+      <view class="row muted"><text>{{item.dateText}}</text><text>{{item.hospital || '医院待补充'}}</text></view>
+      <view class="visit-title">{{item.title}}</view>
+      <view wx:if="{{item.chiefComplaint}}" class="muted complaint">{{item.chiefComplaint}}</view>
+      <view class="tags"><text wx:for="{{item.symptoms}}" wx:for-item="symptom" wx:key="*this" class="badge">{{symptom}}</text><text class="badge">{{item.documentCount}} 份资料</text></view>
+    </button>
+  </block>
+</view>

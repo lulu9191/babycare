@@ -1,0 +1,24 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">本机演示 · 识别内容可能为示例，原件请自行核对</view>
+  <view wx:if="{{loading}}" class="empty">正在读取资料…</view>
+  <view wx:elif="{{error}}" class="empty"><view>{{error}}</view><button class="secondary" bindtap="load">重试</button><button class="secondary" bindtap="goArchive">返回档案</button></view>
+  <block wx:elif="{{document}}">
+    <view class="subtitle">{{person.name}} · {{extracted.date || '日期待确认'}}</view><view class="title">{{kindLabel}}</view><view class="muted">{{extracted.hospital || '医院待补充'}}</view>
+    <view class="card"><view class="section-title">原始资料</view><view wx:if="{{!document.files.length}}" class="empty">示例资料无原件，请自行添加演示照片。</view><button wx:for="{{document.files}}" wx:key="id" class="file-link" data-index="{{index}}" bindtap="preview"><view>{{item.type === 'pdf' ? 'PDF 文档' : '照片'}} · 第 {{index + 1}} 页</view><view class="muted">{{item.name || '查看原件'}} ›</view></button><view class="muted">修改核对文字不会改变原件。</view></view>
+    <view class="card"><view class="row"><view class="section-title">{{document.status === 'confirmed' ? '已核对的内容' : '待核对的内容'}}</view><text class="badge">{{document.status === 'confirmed' ? '已归档' : '待整理'}}</text></view>
+      <view class="detail-row"><text class="muted">就诊人</text><text>{{extracted.patientName || '未识别'}}</text></view>
+      <view wx:if="{{extracted.age}}" class="detail-row"><text class="muted">单据年龄</text><text>{{extracted.age}}</text></view>
+      <view wx:if="{{extracted.department}}" class="detail-row"><text class="muted">科室</text><text>{{extracted.department}}</text></view>
+      <view wx:if="{{extracted.collectionDate}}" class="detail-row"><text class="muted">采样日期</text><text>{{extracted.collectionDate}}</text></view>
+      <view wx:if="{{extracted.reportDate}}" class="detail-row"><text class="muted">报告日期</text><text>{{extracted.reportDate}}</text></view>
+      <view class="detail-row"><text class="muted">医生</text><text>{{extracted.doctor || '未记录'}}</text></view>
+      <block wx:if="{{document.kind === 'medical'}}"><view class="detail-block"><view class="muted">主诉</view><text selectable>{{extracted.chiefComplaint || '未记录'}}</text></view><view class="detail-block"><view class="muted">查体结果</view><text selectable>{{extracted.examination || '未记录'}}</text></view><view class="detail-block"><view class="muted">诊断原文</view><text selectable>{{extracted.diagnosis || '未记录'}}</text></view></block>
+      <block wx:if="{{document.kind === 'lab'}}"><view class="detail-block"><view class="muted">检查所见</view><text selectable>{{extracted.findings || '未记录'}}</text></view><view class="detail-block"><view class="muted">检查结论</view><text selectable>{{extracted.conclusion || '未记录'}}</text></view><view wx:for="{{extracted.items}}" wx:key="index" class="lab-item"><view>{{item.name || '项目待补充'}}</view><view class="lab-value">{{item.value || '结果待补充'}} <text class="muted">{{item.unit}}</text><text wx:if="{{item.flag}}" class="badge">原单标记：{{item.flag}}</text></view><view class="muted">参考范围：{{item.referenceRange || '原单未记录'}}</view></view></block>
+      <view wx:if="{{document.kind === 'prescription'}}"><view wx:for="{{extracted.medications}}" wx:key="index" class="lab-item"><view>{{item.name || '药品待补充'}}</view><view class="muted">规格：{{item.specification || '未记录'}}</view><view>单次剂量：{{item.dose || '未记录'}}</view><view>频次：{{item.frequency || '未记录'}} · 疗程：{{item.duration || '未记录'}}</view></view><view class="muted">这里保留处方记录；实际服药信息在就诊详情中填写。</view></view>
+      <button wx:if="{{document.status !== 'confirmed'}}" class="primary" bindtap="continueReview">继续核对与归档</button>
+    </view>
+    <view class="card"><view class="section-title">关联的就诊</view><view wx:if="{{!linkedVisits.length}}" class="muted">尚未关联。资料已保留，可以以后整理。</view><button wx:for="{{linkedVisits}}" wx:key="id" class="file-link" data-id="{{item.id}}" bindtap="openVisit"><view>{{item.diagnosis || '就诊记录'}} ›</view><view class="muted">{{item.date || '日期待确认'}} · {{item.hospital}}</view></button>
+      <block wx:if="{{choices.length}}"><view class="field">引用到另一条就诊</view><picker range="{{choiceLabels}}" value="{{selectedIndex}}" bindchange="changeChoice"><view class="input">{{choiceLabels[selectedIndex]}}</view></picker><button class="secondary" bindtap="link" loading="{{saving}}" disabled="{{saving}}">确认关联</button></block><view class="muted">同一份报告可用于复诊，原件只保存一份。</view>
+    </view>
+  </block>
+</view>

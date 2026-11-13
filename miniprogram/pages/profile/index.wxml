@@ -1,0 +1,36 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">演示模式 · 本机预览，家庭同步尚未接入</view>
+  <view class="title page-title">我的</view><view class="subtitle">管理健康档案与家庭协作</view>
+  <view wx:if="{{error}}" class="notice"><view>{{error}}</view><button class="secondary" bindtap="retry">重新加载</button></view>
+  <view wx:elif="{{loading}}" class="empty">正在读取资料…</view>
+  <block wx:else>
+    <view class="card">
+      <view class="row"><view class="section-title">健康档案所属人</view><button class="text-button" bindtap="addPerson">＋ 添加</button></view>
+      <view wx:if="{{!persons.length}}" class="empty">先添加孩子或其他家人的档案</view>
+      <view wx:for="{{persons}}" wx:key="id" class="person-row">
+        <button class="person-info" data-id="{{item.id}}" bindtap="switchPerson">
+          <image wx:if="{{item.avatarPath}}" class="avatar" src="{{item.avatarPath}}" mode="aspectFill" /><text wx:else class="avatar fallback">{{item.initial}}</text>
+          <view class="person-text"><view>{{item.name}} <text wx:if="{{item.current}}" class="badge">当前</text></view><view class="muted">{{item.birthDate || '出生日期待补充'}}</view></view>
+        </button>
+        <button class="text-button edit" data-id="{{item.id}}" bindtap="editPerson">编辑</button>
+      </view>
+      <view class="muted help">点击姓名切换当前档案；账号和健康档案分别管理。</view>
+    </view>
+    <view class="card">
+      <view class="row"><view class="section-title">待整理资料</view><text class="badge">{{pending.length}} 份</text></view>
+      <view class="muted">{{person.name || '尚未选择档案'}} · 允许先保存原件，以后再关联就诊</view>
+      <view wx:if="{{!pending.length}}" class="empty compact">暂无待整理资料</view>
+      <button wx:for="{{pending}}" wx:key="id" class="document-row" data-id="{{item.id}}" bindtap="openDocument"><view><view>{{item.kindLabel}}</view><view class="muted">{{item.dateText}}</view></view><text class="badge">{{item.statusLabel}}</text><text class="chevron">›</text></button>
+    </view>
+    <view class="card">
+      <view class="section-title">家人共同维护</view>
+      <view class="muted">{{family.name}}</view>
+      <view wx:for="{{members}}" wx:key="key" class="member-row"><text>{{item.name}}</text><text class="badge">{{item.roleLabel}}</text></view>
+      <view class="help">家人可共同上传、查看和修改；管理员管理邀请和访问权限。资料保留上传人、修改人和修改时间。</view>
+      <view wx:if="{{mode === 'demo'}}" class="notice">这里展示协作设计，当前示例成员没有真实访问权限。</view>
+      <button class="secondary" bindtap="showInviteInfo">家庭邀请接入说明</button>
+    </view>
+    <view class="card"><view class="section-title">云端 AI 识别</view><view class="help">病历、检查单和处方自动整理，核对后归档。原件始终保留。</view><view wx:if="{{mode === 'demo'}}" class="muted">当前使用模拟识别，不会发送照片给 AI 服务；真实识别服务尚未接入。</view></view>
+    <button wx:if="{{mode === 'demo'}}" class="reset-button" bindtap="resetDemo">重置本机演示数据</button>
+  </block>
+</view>

@@ -1,0 +1,15 @@
+<view class="page">
+  <view wx:if="{{mode === 'demo'}}" class="demo-banner">本机演示 · 用药记录不会同步给家人</view>
+  <view wx:if="{{loading}}" class="empty">正在读取用药记录…</view>
+  <view wx:elif="{{!medication}}" class="empty"><view>{{error || '没有找到用药记录'}}</view><button class="secondary" bindtap="retry">重试</button><button class="secondary" bindtap="goArchive">返回档案</button></view>
+  <block wx:else>
+    <view class="subtitle">{{person.name}}的用药情况</view><view class="title">{{medication.name}}</view>
+    <view class="card"><view class="section-title">医生开具的处方</view><view class="prescription-line">规格：{{medication.specification || '未记录'}}</view><view class="prescription-line">单次剂量：{{medication.dose || '未记录'}}</view><view class="prescription-line">频次：{{medication.frequency || '未记录'}}</view><view class="prescription-line">疗程：{{medication.duration || '未记录'}}</view><button class="secondary" bindtap="viewPrescription">查看处方与原件</button></view>
+    <view class="card"><view class="section-title">实际服药情况</view><view class="muted">日期按实际情况填写，不确定时可以留空。</view>
+      <view class="field">实际开始日期<view class="date-row"><picker mode="date" value="{{startDate}}" data-field="startDate" bindchange="updateDate"><view class="input">{{startDate || '尚未记录'}}</view></picker><button class="clear" data-field="startDate" bindtap="clearDate">留空</button></view></view>
+      <view class="field">实际停止日期<view class="date-row"><picker mode="date" value="{{stopDate}}" data-field="stopDate" bindchange="updateDate"><view class="input">{{stopDate || '尚未记录'}}</view></picker><button class="clear" data-field="stopDate" bindtap="clearDate">留空</button></view></view>
+      <label class="field">用药备注<textarea class="input notes" value="{{note}}" bindinput="updateNote" placeholder="如：尚未开始、暂停原因、实际使用情况等" maxlength="2000" auto-height /></label>
+    </view>
+    <view wx:if="{{error}}" class="notice error" role="alert">{{error}}<button class="secondary" bindtap="retry">重新读取已保存版本</button></view><button class="primary" loading="{{saving}}" disabled="{{saving}}" bindtap="save">保存实际用药</button><view class="muted footer-note">每种药单独记录。处方信息与原件保持不变。</view>
+  </block>
+</view>

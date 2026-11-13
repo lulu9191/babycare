@@ -1,0 +1,13 @@
+node_modules/
+coverage/
+dist/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+project.private.config.json
+*.pem
+*.key
+local-data/
+uploads/
